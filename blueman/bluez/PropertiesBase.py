@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 from gi.repository import GObject
 from blueman.Functions import dprint
 from blueman.bluez.Base import Base
-from blueman.bluez.errors import raise_dbus_error
 import dbus
 
 
@@ -32,12 +31,10 @@ class PropertiesBase(Base):
             for name, value in changed_properties.items():
                 self._on_property_changed(name, value)
 
-    @raise_dbus_error
     def set(self, name, value):
         if type(value) is int:
             value = dbus.UInt32(value)
-        return self.__properties_interface.Set(self._interface_name, name, value)
+        return self._call('Set', self._interface_name, name, value, interface=self.__properties_interface)
 
-    @raise_dbus_error
     def get_properties(self):
-        return self.__properties_interface.GetAll(self._interface_name)
+        return self._call('GetAll', self._interface_name, interface=self.__properties_interface)
