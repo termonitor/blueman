@@ -8,7 +8,6 @@ from blueman.Functions import dprint
 from blueman.bluez.Adapter import Adapter
 from blueman.bluez.PropertiesBase import PropertiesBase
 from blueman.bluez.errors import DBusNoSuchAdapterError
-from dbus.mainloop.glib import DBusGMainLoop
 
 
 class Manager(PropertiesBase):
@@ -18,11 +17,9 @@ class Manager(PropertiesBase):
     }
 
     def __init__(self):
-        DBusGMainLoop(set_as_default=True)
-
         super(Manager, self).__init__('org.freedesktop.DBus.ObjectManager', '/')
         self._handle_signal(self._on_interfaces_added, 'InterfacesAdded')
-            self._handle_signal(self._on_interfaces_removed, 'InterfacesRemoved')
+        self._handle_signal(self._on_interfaces_removed, 'InterfacesRemoved')
 
     def _on_adapter_added(self, adapter_path):
         dprint(adapter_path)
