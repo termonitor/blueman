@@ -1,5 +1,9 @@
 # Changelog
 
+## 2-0-stable (unreleased)
+
+* Fix exception when connecting to serial service
+
 ## 2.0
 
 No relevant changes
