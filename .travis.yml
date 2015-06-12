@@ -8,5 +8,7 @@ env:
   - PYTHON=python3.2
 
 before_install:
+  - echo 'deb http://archive.ubuntu.com/ubuntu wily main' | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
+  - sudo rm /etc/dpkg/dpkg.cfg.d/multiarch:1
   - sudo apt-get install -qq automake autoconf libglib2.0-dev libtool python-gi-dev libbluetooth-dev intltool python-dev python3-dev cython python-dbus python3-dbus dh-autoreconf
