@@ -5,7 +5,6 @@ from __future__ import division
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import Pango
 import os.path
@@ -35,8 +34,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 class BluemanAdapters:
     def __init__(self, selected_hci_dev):
         setup_icon_path()
-        self.bus = dbus.SystemBus()
-        self.bus.watch_name_owner('org.bluez', self.on_dbus_name_owner_change)
+        Bluez.Manager.watch_name_owner(self._on_dbus_name_appeared, self._on_dbus_name_vanished)
 
         builder = Gtk.Builder()
         builder.set_translation_domain("blueman")
@@ -88,11 +86,13 @@ class BluemanAdapters:
         adapter = Bluez.Adapter(adapter_path)
         sig = adapter.connect_signal('property-changed', on_property_changed)
 
-    def on_dbus_name_owner_change(self, owner):
-        print('org.bluez owner changed to '+owner)
-        if owner == '':
-            self.manager = None
-        #fixme: show error dialog and exit
+    def _on_dbus_name_appeared(self, _connection, _name, owner):
+        dprint(owner)
+
+    def _on_dbus_name_vanished(self, _connection, _name, _owner):
+        dprint()
+        self.manager = None
+        # FIXME: show error dialog and exit
 
     def build_adapter_tab(self, adapter):
         adapter_settings = {}

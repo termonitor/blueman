@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from gi.repository import GObject, GLib, Gtk
+from gi.repository import GObject, GLib, Gtk, Gio
 from datetime import datetime
 import os
 import shutil
@@ -13,10 +13,6 @@ from blueman.gui.Notification import Notification
 from blueman.main.Device import Device
 from blueman.plugins.AppletPlugin import AppletPlugin
 from blueman.main.Config import Config
-
-import dbus
-import dbus.service
-
 
 class _Agent:
     def __init__(self, applet):
@@ -155,11 +151,11 @@ class TransferService(AppletPlugin):
         self._manager.connect("transfer-completed", self._on_transfer_completed)
         self._manager.connect('session-removed', self._on_session_removed)
 
-        self._watch = dbus.SessionBus().watch_name_owner("org.bluez.obex", self._on_obex_owner_changed)
+        self._watch = obex.Manager.watch_name_owner(self._on_dbus_name_appeared, self._on_dbus_name_vanished)
 
     def on_unload(self):
         if self._watch:
-            self._watch.cancel()
+            Gio.bus_unwatch_name(self._watch)
 
         self._agent = None
 
@@ -167,12 +163,13 @@ class TransferService(AppletPlugin):
         if not state:
             self._agent = None
 
-    def _on_obex_owner_changed(self, owner):
-        dprint("obex owner changed:", owner)
-        if owner == "":
-            self._agent = None
-        else:
-            self._agent = _Agent(self._applet)
+    def _on_dbus_name_appeared(self, _connection, _name, owner):
+        dprint(owner)
+        self._agent = _Agent(self._applet)
+
+    def _on_dbus_name_vanished(self, _connection, _name, _owner):
+        dprint()
+        self._agent = None
 
     def _on_transfer_started(self, _manager, transfer_path):
         if transfer_path not in self._agent.transfers:
