@@ -2,6 +2,10 @@
 
 ## 2-0-stable (unreleased)
 
+### Changes
+
+* Add title to status icon
+
 ### Bugs fixed
 
 * Codepoint issues when connecting to serial service
