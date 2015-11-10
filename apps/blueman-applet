@@ -34,6 +34,11 @@ import blueman.plugins.applet
 from blueman.plugins.AppletPlugin import AppletPlugin
 from blueman.plugins.BasePlugin import BasePlugin
 
+if 'DBUS_SYSTEM_BUS_ADDRESS' or 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+    import dbusmock
+    dbus.SystemBus = lambda: dbusmock.DBusTestCase.get_dbus(True)
+    dbus.SessionBus = lambda: dbusmock.DBusTestCase.get_dbus(False)
+
 import blueman.bluez as Bluez
 
 from blueman.main.PluginManager import PersistentPluginManager
