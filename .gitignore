@@ -62,3 +62,4 @@ Makefile
 
 # Local execution
 /blueman/**/*.pyc
+.DS_Store
